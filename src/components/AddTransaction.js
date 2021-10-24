@@ -1,40 +1,52 @@
 import React, {useState, useContext} from 'react'
-import { GlobalContext } from '../context/GlobalState';
+import { myContext } from '../context/GlobalState';
 
 export const AddTransaction = () => {
-  const [text, setText] = useState('');
-  const [amount, setAmount] = useState(0);
 
-  const { addTransaction } = useContext(GlobalContext);
+let [description, setDescription] = useState('');
+let [amount, setAmount] = useState(0);
+let [state, dispatch] = useContext(myContext)
 
-  const onSubmit = e => {
-    e.preventDefault();
+const handleSumbit = (e)=>{
 
-    const newTransaction = {
-      id: Math.floor(Math.random() * 100000000),
-      text,
-      amount: +amount
-    }
-
-    addTransaction(newTransaction);
+   
+  e.preventDefault();
+  setAmount(parseInt(amount));
+  if (amount>0) {
+    dispatch(
+      {
+        type: 'income'
+        ,payload: {desc:description, amount}
+      })
+    
+  } else if(amount < 0){
+    
+    dispatch(
+      {
+        type: 'expense'
+        ,payload: {desc:description, amount}
+      })
   }
+  setAmount(0)
+  setDescription('')
+}
 
   return (
     <>
       <h3>Add new transaction</h3>
-      <form onSubmit={onSubmit}>
+      <form >
         <div className="form-control">
           <label htmlFor="text">Text</label>
-          <input type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Enter text..." />
+          <input type="text"  placeholder="Enter text..."  value={description} onChange={(e)=>{setDescription(e.target.value)}}/>
         </div>
         <div className="form-control">
           <label htmlFor="amount"
             >Amount <br />
             (negative - expense, positive - income)</label
           >
-          <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount..." />
+          <input type="number" value={amount} onChange={(e)=>{setAmount(e.target.value)}} placeholder="Enter amount..." />
         </div>
-        <button className="btn">Add transaction</button>
+        <button className="btn" onClick={(e)=>{handleSumbit(e)}}>Add transaction</button>
       </form>
     </>
   )

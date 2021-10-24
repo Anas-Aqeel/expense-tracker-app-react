@@ -1,16 +1,42 @@
 export default (state, action) => {
-  switch(action.type) {
-    case 'DELETE_TRANSACTION':
+  action.payload.amount = parseInt(action.payload.amount)
+  switch (action.type) {
+    case ('income'):
       return {
-        ...state,
-        transactions: state.transactions.filter(transaction => transaction.id !== action.payload)
+
+        transactions: [...state.transactions,
+        {
+          ...action.payload,
+          type: action.type,
+          id: Date.now(),
+        }],
+        income: action.payload.amount + state.income,
+        expense: state.expense
       }
-    case 'ADD_TRANSACTION':
+    case ('expense'):
       return {
-        ...state,
-        transactions: [action.payload, ...state.transactions]
+
+        transactions: [...state.transactions, { ...action.payload, type: action.type, id: Date.now() }],
+        income: state.income,
+        expense: action.payload.amount + state.expense,
       }
-    default:
-      return state;
+    case ('delete'):
+      if(action.payload.type == 'income'){
+
+        return {
+          transactions: state.transactions.filter((e)=> e != action.payload),
+          income: state.income - action.payload.amount,
+          expense: state.expense,
+        }
+      }else{
+
+        return {
+          transactions: state.transactions.filter((e)=> e != action.payload),
+          income: state.income,
+          expense: state.expense - action.payload.amount,
+        }
+      }
+
   }
+
 }
